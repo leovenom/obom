@@ -24,6 +24,12 @@ Copie `.env.example` para `.env` no servidor.
 
 Nunca commite `.env` com secrets reais.
 
+### Vercel
+
+1. **Project → Settings → Environment Variables** — defina pelo menos `AUTH_SECRET`, `NEXTAUTH_URL` (URL `https://….vercel.app`), `ADMIN_PASSWORD` em **Production** (e Preview se necessário).
+2. **Redeploy** depois de gravar variáveis (o build já não exige `AUTH_SECRET` na fase de compilação, mas **runtime sem secret falha**).
+3. Storage em disco (`uploads/`, `data/`) **não persiste** — ver secção 6.
+
 ## 2. Google OAuth (se usar)
 
 1. Credencial OAuth tipo **Web** no Google Cloud Console.

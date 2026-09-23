@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
-import { getAuthSecret, isGoogleAuthEnabled } from '@/lib/google-auth-config';
+import { isGoogleAuthEnabled, resolveAuthSecretForNextAuth } from '@/lib/google-auth-config';
 import { upsertGoogleUser } from '@/lib/google-user';
 
 const providers = [];
@@ -16,7 +16,7 @@ if (isGoogleAuthEnabled()) {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
-  secret: getAuthSecret(),
+  secret: resolveAuthSecretForNextAuth(),
   trustHost: true,
   callbacks: {
     async signIn({ account, profile }) {
