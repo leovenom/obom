@@ -11,6 +11,7 @@
     "plates:dev": "bash python/plate_service/scripts/run.sh",
     "build": "next build",
     "start": "node scripts/start.js",
+    "start:mobile": "bash scripts/prod-mobile.sh",
     "start:express": "node server/index.js",
     "lint": "next lint"
   },

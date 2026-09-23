@@ -44,6 +44,21 @@ npm run start
 
 Em desenvolvimento local com telemóvel: `npm run dev:mobile` (certificado HTTPS local).
 
+### Teste no iPhone (build de produção, mesma Wi‑Fi)
+
+O iPhone **não** activa câmera/GPS em `http://`. `npm run start` só expõe HTTP; use:
+
+```bash
+npm run build
+npm run start:mobile
+```
+
+No `.env`, defina `NEXTAUTH_URL` para o URL HTTPS mostrado (ex. `https://192.168.1.x:3001`).
+Login **Google** exige esse redirect no Cloud Console; para um teste rápido use **e-mail/senha**.
+
+Para expor na internet (4G, fora de casa): VPS com HTTPS ou túnel (Cloudflare Tunnel / ngrok)
+com `NEXTAUTH_URL` igual à URL pública — ver secção 6 (storage persistente num VPS).
+
 ## 4. Serviço de placas (opcional)
 
 ```bash
