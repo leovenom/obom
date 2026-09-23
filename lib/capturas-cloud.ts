@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from '@/lib/persistence/sql';
 import type { AuthorityReport } from '@/lib/commission';
 import type { CaptureMetadata } from '@/lib/types';
 import type { CaptureRecord, CaptureSummary, UserCaptureGroup } from '@/lib/capturas-types';
@@ -51,7 +51,7 @@ export async function cloudRegisterCapture(record: CaptureRecord): Promise<Captu
 
 export async function cloudGetAllCapturas(): Promise<CaptureRecord[]> {
   await ensureCloudSchema();
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT * FROM obom_captures ORDER BY uploaded_at DESC LIMIT 2000
   `;
   return rows.map(rowToRecord);
@@ -59,7 +59,7 @@ export async function cloudGetAllCapturas(): Promise<CaptureRecord[]> {
 
 export async function cloudGetCaptureById(id: string): Promise<CaptureRecord | null> {
   await ensureCloudSchema();
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT * FROM obom_captures
     WHERE id = ${id} OR filename = ${id} OR protocolo = ${id}
     LIMIT 1

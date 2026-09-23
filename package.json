@@ -16,8 +16,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@vercel/blob": "^2.8.0",
-    "@vercel/postgres": "^0.10.0",
     "lucide-react": "^1.47.0",
     "next": "^15.1.0",
     "next-auth": "^5.0.0-beta.32",

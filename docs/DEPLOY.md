@@ -33,7 +33,7 @@ Nunca commite `.env` com secrets reais.
 #### Persistência na Vercel (Blob + Postgres)
 
 1. No projecto Vercel: **Storage → Create Database** (Postgres / Neon) e **Create Blob Store**.
-2. Ligue ambos ao projecto OBOM (variáveis `POSTGRES_URL` e `BLOB_READ_WRITE_TOKEN` são injectadas).
+2. Ligue ambos ao projecto OBOM (variáveis `POSTGRES_URL` / `DATABASE_URL` e `BLOB_READ_WRITE_TOKEN` são injectadas). A app usa o SDK **`@neondatabase/serverless`** (não `@vercel/postgres`, deprecado).
 3. Redeploy. As tabelas `obom_*` são criadas no primeiro pedido.
 4. Localmente, sem estas variáveis, continua a usar `uploads/` e `data/` no disco.
 

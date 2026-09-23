@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from '@/lib/persistence/sql';
 
 let schemaReady: Promise<void> | null = null;
 

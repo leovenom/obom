@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from '@/lib/persistence/sql';
 import { ensureCloudSchema } from '@/lib/persistence/schema';
 import type { StoredSession, StoredUser } from '@/lib/db-types';
 
@@ -20,7 +20,7 @@ function rowToUser(row: Record<string, unknown>): StoredUser {
 
 export async function cloudFindUserByEmail(email: string): Promise<StoredUser | undefined> {
   await ensureCloudSchema();
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT * FROM obom_users WHERE LOWER(email) = LOWER(${email}) LIMIT 1
   `;
   return rows[0] ? rowToUser(rows[0]) : undefined;
@@ -28,7 +28,7 @@ export async function cloudFindUserByEmail(email: string): Promise<StoredUser | 
 
 export async function cloudFindUserByGoogleId(googleId: string): Promise<StoredUser | undefined> {
   await ensureCloudSchema();
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT * FROM obom_users WHERE google_id = ${googleId} LIMIT 1
   `;
   return rows[0] ? rowToUser(rows[0]) : undefined;
@@ -36,7 +36,7 @@ export async function cloudFindUserByGoogleId(googleId: string): Promise<StoredU
 
 export async function cloudFindUserById(id: string): Promise<StoredUser | undefined> {
   await ensureCloudSchema();
-  const { rows } = await sql`SELECT * FROM obom_users WHERE id = ${id} LIMIT 1`;
+  const rows = await sql`SELECT * FROM obom_users WHERE id = ${id} LIMIT 1`;
   return rows[0] ? rowToUser(rows[0]) : undefined;
 }
 
@@ -106,7 +106,7 @@ export async function cloudCreateSession(userId: string, token: string, daysVali
 
 export async function cloudFindSession(token: string): Promise<StoredSession | undefined> {
   await ensureCloudSchema();
-  const { rows } = await sql`
+  const rows = await sql`
     SELECT token, user_id, expires_at FROM obom_sessions WHERE token = ${token} LIMIT 1
   `;
   if (!rows[0]) return undefined;
