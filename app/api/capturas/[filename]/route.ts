@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { getSessionUser } from '@/lib/auth';
 import { getCaptureById } from '@/lib/capturas-registry';
-import { readUploadFile } from '@/lib/upload-files';
+import { isSafeCaptureFilename, readUploadFile } from '@/lib/upload-files';
 
 export async function GET(
   _request: NextRequest,
@@ -10,14 +10,21 @@ export async function GET(
 ) {
   const { filename } = await params;
 
+  if (!isSafeCaptureFilename(filename)) {
+    return NextResponse.json({ error: 'Nome de ficheiro inválido' }, { status: 400 });
+  }
+
+  const [user, isAdmin] = await Promise.all([getSessionUser(), isAdminAuthenticated()]);
+  if (!user && !isAdmin) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+  }
+
   const record = getCaptureById(filename);
   if (!record) {
     return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 });
   }
 
-  const [user, isAdmin] = await Promise.all([getSessionUser(), isAdminAuthenticated()]);
   const isOwner = user?.id === record.userId;
-
   if (!isAdmin && !isOwner) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }

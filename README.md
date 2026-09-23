@@ -44,6 +44,12 @@ npm run dev
 
 Acesse `http://localhost:3001`
 
+## Produção
+
+Guia completo: **[docs/DEPLOY.md](docs/DEPLOY.md)** — HTTPS, variáveis obrigatórias (`AUTH_SECRET`, `NEXTAUTH_URL`, `ADMIN_PASSWORD`), OAuth, `npm run build` + `npm run start`, riscos de storage local e rotação da senha admin.
+
+Use `.env.example` como referência; não commite secrets reais.
+
 ## Login com Google (Gmail)
 
 Guia completo: [docs/GOOGLE-OAUTH.md](docs/GOOGLE-OAUTH.md)

@@ -1,50 +1,87 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version change: (template placeholders) → 1.0.0
+- Modified principles: all placeholders replaced with OBOM-specific governance
+- Added sections: Security & Privacy, Development Workflow (filled)
+- Removed sections: none
+- Deferred TODOs: none
+-->
+
+# OBOM Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Fluxo de captura preservado
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+O fluxo permissions → câmera → revisão → auth/perfil (quando necessário) → envio → sucesso
+MUST remain intact unless a spec explicitly documents a breaking UX change and migration.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale:** Users and field workflows depend on a stable capture path; silent flow changes
+cause lost submissions and support burden.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Stack e estrutura
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+Implementation MUST stay on Next.js App Router, TypeScript, React components in `components/`,
+hooks in `hooks/`, and route handlers in `app/api/`. New code MUST match existing naming,
+imports, and patterns in adjacent files.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale:** Consistency reduces review cost and avoids parallel architectures in one repo.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Segurança e acesso
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Sensitive routes MUST enforce authentication. Secrets MUST NOT be committed (`.env` stays
+ignored). Admin dashboard and capture media MUST NOT be world-readable. Media filenames MUST
+be validated against path traversal. Production MUST use strong `ADMIN_PASSWORD` and
+`AUTH_SECRET`.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale:** The app handles personal media, location metadata, and identity data.
+
+### IV. Privacidade de localização
+
+Full address and coordinates belong in metadata, JSON, and admin views—not burned into
+capture overlays unless a future spec explicitly requires it. UI MUST NOT expose crude IP
+fallback messaging to end users.
+
+**Rationale:** Location is sensitive; presentation should match user expectations and prior
+product decisions.
+
+### V. Qualidade mínima verificável
+
+Before treating work as done, `npm run build` and `npx tsc --noEmit` MUST pass. Changes MUST
+be the smallest correct diff. User-facing copy MUST be European Portuguese.
+
+**Rationale:** The project ships as a PWA with no automated test suite yet; build/type gates
+and scope discipline are the baseline quality bar.
+
+## Security & Privacy Requirements
+
+- HTTPS is required for camera and geolocation on mobile browsers; dev uses documented
+  `dev:mobile` / certificate trust flows.
+- Upload endpoints MUST reject unauthenticated submissions.
+- Authority JSON and dashboard data are admin-facing; access controls MUST be preserved when
+  adding features.
+- Storage today is local (`uploads/`, `data/capturas/`); any move to object storage or DB MUST
+  include a spec with migration and rollback notes.
+
+## Development Workflow
+
+- Spec Kit SDD: constitution once per project; per feature use specify → (clarify) → plan →
+  tasks → (analyze) → implement → converge.
+- Do not drive large refactors or deployment changes through constitution updates—use
+  `/speckit-specify` instead.
+- Optional plate service (Python, port 5050) MAY be offline; browser OCR fallback MUST remain
+  functional for capture flows.
+- Auth MUST support email/password and Google (NextAuth) where configured; incomplete profiles
+  MUST block send until required fields are satisfied per existing `profileComplete` rules.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes ad-hoc agent instructions for OBOM when they conflict. Amendments
+require updating this file, bumping `CONSTITUTION_VERSION` semantically, and setting
+`LAST_AMENDED_DATE`. MAJOR bumps remove or redefine non-negotiable rules; MINOR adds principles
+or material guidance; PATCH clarifies wording only.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Compliance: every `/speckit-plan` and `/speckit-implement` cycle MUST be checked against these
+principles. Justify exceptions in the feature spec or plan.
+
+**Version**: 1.0.0 | **Ratified**: 2026-09-23 | **Last Amended**: 2026-09-23
