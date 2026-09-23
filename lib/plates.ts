@@ -1,112 +1,54 @@
-const LETTER_FIX: Record<string, string> = {
-  '0': 'O',
-  '1': 'I',
-  '2': 'Z',
-  '5': 'S',
-  '6': 'G',
-  '8': 'B',
-};
-
-const DIGIT_FIX: Record<string, string> = {
-  O: '0',
-  Q: '0',
-  D: '0',
-  I: '1',
-  L: '1',
-  Z: '2',
-  S: '5',
-  G: '6',
-  B: '8',
-};
+import {
+  cleanPlateAlphanumeric,
+  fixEuropeanPlateOcr,
+  formatEuropeanPlate,
+  isValidEuropeanPlate,
+  matchEuropeanPattern,
+  normalizeEuropeanPlateInput,
+} from '@/lib/european-plates';
 
 const MIN_WORD_CONFIDENCE = 58;
 const MIN_FIXED_CONFIDENCE = 68;
 const MIN_ACCEPT_SCORE = 75;
+const MIN_GENERIC_CONFIDENCE = 68;
 const MAX_AUTO_PLATES = 1;
-
-function isEuropeanPlate(s: string): boolean {
-  return s.length === 6 && /^[A-Z]{2}[0-9]{2}[A-Z]{2}$/.test(s);
-}
-
-function isInternationalPlate(s: string): boolean {
-  if (s.length < 5 || s.length > 8) return false;
-  const letters = (s.match(/[A-Z]/g) ?? []).length;
-  const digits = (s.match(/[0-9]/g) ?? []).length;
-  return letters >= 2 && digits >= 2 && /^[A-Z0-9]+$/.test(s);
-}
+const PLATE_MIN_LEN = 5;
+const PLATE_MAX_LEN = 8;
 
 export function isValidPlate(str: string): boolean {
-  const s = str.replace(/[^A-Z0-9]/g, '');
-  if (s.length < 5 || s.length > 8) return false;
-  if (s.length === 7 && /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(s)) return true;
-  if (s.length === 7 && /^[A-Z]{3}[0-9]{4}$/.test(s)) return true;
-  if (isEuropeanPlate(s)) return true;
-  return isInternationalPlate(s);
+  return isValidEuropeanPlate(str);
 }
 
 export function formatPlate(str: string): string {
-  const s = str.replace(/[^A-Z0-9]/g, '');
-  if (/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(s)) return s;
-  if (/^[A-Z]{3}[0-9]{4}$/.test(s)) return `${s.slice(0, 3)}-${s.slice(3)}`;
-  if (isEuropeanPlate(s)) return `${s.slice(0, 2)} ${s.slice(2, 4)} ${s.slice(4, 6)}`;
-  return s;
+  return formatEuropeanPlate(str);
 }
 
-/** Normaliza texto digitado pelo usuário. */
 export function normalizePlateInput(input: string): string | null {
-  const cleaned = input.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (cleaned.length < 5 || cleaned.length > 8) return null;
-  if (isValidPlate(cleaned)) return formatPlate(cleaned);
-  if (cleaned.length === 7) {
-    const fixed = fixPlateChars(cleaned, 3);
-    if (fixed && isValidPlate(fixed)) return formatPlate(fixed);
-  }
-  return null;
+  return normalizeEuropeanPlateInput(input);
 }
 
 function countCorrections(raw: string, fixed: string): number {
   let n = 0;
-  for (let i = 0; i < 7; i++) {
+  const len = Math.min(raw.length, fixed.length);
+  for (let i = 0; i < len; i++) {
     if (raw[i] !== fixed[i]) n++;
   }
-  return n;
+  return n + Math.abs(raw.length - fixed.length);
 }
 
-function fixPlateChars(raw: string, maxCorrections = 2): string | null {
-  if (raw.length !== 7) return null;
-
-  const tryFormat = (chars: string[]): string | null => {
-    const mercosul = chars.join('');
-    if (/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(mercosul)) return mercosul;
-
-    const old = [...raw.toUpperCase()];
-    for (let i = 0; i < 3; i++) {
-      if (/\d/.test(old[i])) old[i] = LETTER_FIX[old[i]] ?? old[i];
-    }
-    for (let i = 3; i < 7; i++) {
-      if (/[A-Z]/.test(old[i])) old[i] = DIGIT_FIX[old[i]] ?? old[i];
-    }
-    const oldFmt = old.join('');
-    if (/^[A-Z]{3}[0-9]{4}$/.test(oldFmt)) return oldFmt;
-
-    return null;
-  };
-
-  const chars = raw.toUpperCase().split('');
-  for (let i = 0; i < 3; i++) {
-    if (/\d/.test(chars[i])) chars[i] = LETTER_FIX[chars[i]] ?? chars[i];
+function pushOcrLengths(
+  merged: string,
+  confidence: number,
+  push: (raw: string, conf: number) => void
+): void {
+  if (merged.length >= PLATE_MIN_LEN && merged.length <= PLATE_MAX_LEN) {
+    push(merged, confidence);
   }
-  if (/[A-Z]/.test(chars[3])) chars[3] = DIGIT_FIX[chars[3]] ?? chars[3];
-  if (/\d/.test(chars[4])) chars[4] = LETTER_FIX[chars[4]] ?? chars[4];
-  for (let i = 5; i < 7; i++) {
-    if (/[A-Z]/.test(chars[i])) chars[i] = DIGIT_FIX[chars[i]] ?? chars[i];
+  for (let len = PLATE_MAX_LEN; len >= PLATE_MIN_LEN; len--) {
+    for (let i = 0; i + len <= merged.length; i++) {
+      push(merged.slice(i, i + len), confidence);
+    }
   }
-
-  const fixed = tryFormat(chars);
-  if (!fixed) return null;
-
-  const corrections = countCorrections(raw.toUpperCase(), fixed);
-  return corrections <= maxCorrections ? fixed : null;
 }
 
 interface PlateCandidate {
@@ -119,28 +61,33 @@ function normalizeOcrToken(text: string): string {
 }
 
 function evaluateToken(raw: string, confidence: number): PlateCandidate | null {
-  const token = normalizeOcrToken(raw);
-  if (token.length < 5 || token.length > 8) return null;
+  const cleaned = cleanPlateAlphanumeric(raw);
+  if (cleaned.length < PLATE_MIN_LEN || cleaned.length > PLATE_MAX_LEN) return null;
 
-  const cleaned = token.replace(/[^A-Z0-9]/g, '');
-  if (cleaned.length < 5 || cleaned.length > 8) return null;
+  const tryAccept = (value: string, baseConfidence: number, corrected: boolean): PlateCandidate | null => {
+    if (!isValidEuropeanPlate(value)) return null;
+    const known = matchEuropeanPattern(value) !== null;
+    const minConf = known
+      ? corrected
+        ? MIN_FIXED_CONFIDENCE
+        : MIN_WORD_CONFIDENCE
+      : MIN_GENERIC_CONFIDENCE;
+    let score = baseConfidence + (baseConfidence >= 75 ? 15 : 0);
+    if (!known) score -= 8;
+    if (corrected) {
+      const corrections = countCorrections(cleaned, value);
+      score -= corrections * 12;
+    }
+    if (baseConfidence < minConf || score < MIN_ACCEPT_SCORE) return null;
+    return { plate: formatEuropeanPlate(value), score };
+  };
 
-  if (isValidPlate(cleaned)) {
-    const score = confidence + (confidence >= 75 ? 20 : 0);
-    if (confidence < MIN_WORD_CONFIDENCE || score < MIN_ACCEPT_SCORE) return null;
-    return { plate: formatPlate(cleaned), score };
-  }
+  const direct = tryAccept(cleaned, confidence, false);
+  if (direct) return direct;
 
-  if (cleaned.length !== 7) return null;
-
-  const fixed = fixPlateChars(cleaned, 2);
-  if (!fixed || !isValidPlate(fixed)) return null;
-
-  const corrections = countCorrections(cleaned, fixed);
-  const score = confidence - corrections * 12;
-  if (confidence < MIN_FIXED_CONFIDENCE || score < MIN_ACCEPT_SCORE) return null;
-
-  return { plate: formatPlate(fixed), score };
+  const fixed = fixEuropeanPlateOcr(cleaned, 2);
+  if (!fixed) return null;
+  return tryAccept(fixed, confidence, true);
 }
 
 type TesseractWorker = Awaited<
@@ -223,9 +170,7 @@ function extractCandidatesFromText(text: string, confidence: number): PlateCandi
 
   for (const line of text.toUpperCase().split(/\n+/)) {
     const merged = line.replace(/[^A-Z0-9]/g, '');
-    if (merged.length >= 5 && merged.length <= 8) {
-      push(merged, confidence);
-    }
+    pushOcrLengths(merged, confidence, push);
 
     const tokens = line
       .split(/\s+/)
@@ -233,16 +178,11 @@ function extractCandidatesFromText(text: string, confidence: number): PlateCandi
       .filter(Boolean);
 
     if (tokens.length >= 2) {
-      const joined = tokens.join('');
-      if (joined.length >= 5 && joined.length <= 8) {
-        push(joined, confidence);
-      }
+      pushOcrLengths(tokens.join(''), confidence, push);
     }
 
     for (const part of tokens) {
-      if (part.length >= 5 && part.length <= 8) {
-        push(part, confidence);
-      }
+      pushOcrLengths(part, confidence, push);
     }
   }
 
@@ -338,7 +278,7 @@ function renderRegion(
   return canvas.toDataURL('image/jpeg', 0.95);
 }
 
-/** Recortes focados onde a placa costuma aparecer — evita OCR na imagem inteira. */
+/** Recortes focados onde a matrícula costuma aparecer. */
 function generateImageVariants(img: HTMLImageElement): string[] {
   const w = img.width;
   const h = img.height;
@@ -443,7 +383,7 @@ async function registerPlatesClient(
   }
 }
 
-/** fast-alpr via API; se não achar placa, fallback Tesseract no navegador. */
+/** fast-alpr via API; se não achar matrícula, fallback Tesseract no navegador. */
 export async function detectPlatesFromPhoto(
   dataUrl: string,
   options: { register?: boolean } = {}

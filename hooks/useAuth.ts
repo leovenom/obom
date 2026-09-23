@@ -78,13 +78,7 @@ export function useAuth() {
   );
 
   const updateProfile = useCallback(
-    async (fields: {
-      nome: string;
-      cpf: string;
-      telefone: string;
-      chavePix: string;
-      endereco?: string;
-    }) => {
+    async (fields: { nome: string; telefone: string }) => {
       const res = await fetch('/api/auth/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },

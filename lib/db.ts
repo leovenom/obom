@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { isValidPtPhone } from '@/lib/phone-pt';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
@@ -113,5 +114,5 @@ export function sanitizeUser(user: StoredUser) {
 }
 
 export function isProfileComplete(user: StoredUser): boolean {
-  return !!(user.nome && user.cpf && user.telefone && user.chavePix);
+  return !!(user.nome?.trim() && user.telefone && isValidPtPhone(user.telefone));
 }

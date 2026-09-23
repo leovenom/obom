@@ -25,7 +25,7 @@ export default function SuccessScreen({
 
       <div className="success-content">
         <IconCircle icon={CheckCircle2} variant="success" size="lg" />
-        <h2>Enviado com sucesso!</h2>
+        <h2>Enviado com sucesso</h2>
         <p className="success-message">{message}</p>
 
         {protocolo && (

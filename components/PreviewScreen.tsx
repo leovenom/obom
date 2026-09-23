@@ -77,7 +77,7 @@ export default function PreviewScreen({
   const handleAddPlate = () => {
     const plate = normalizePlateInput(manualPlate);
     if (!plate) {
-      setPlateError('Placa inválida. Ex: ABC1D23, PL 30 MR ou 5AU5341');
+      setPlateError('Matrícula europeia inválida. Ex.: AB 12 CD, AB 123 CD, 1234 BCD');
       return;
     }
     setPlateError('');
@@ -177,14 +177,14 @@ export default function PreviewScreen({
         </div>
 
         <div className="info-card info-card--primary">
-          <h3>Placas detectadas</h3>
+          <h3>Matrículas detectadas</h3>
           <div className="plates-list">
             {platesLoading ? (
               <span className="loading">
                 {capture.type === 'video' ? 'Analisando vídeo...' : 'Analisando foto...'}
               </span>
             ) : capture.plates.length === 0 ? (
-              <span className="none">Nenhuma placa detectada — adicione manualmente abaixo</span>
+              <span className="none">Nenhuma matrícula detectada — adicione manualmente abaixo</span>
             ) : (
               capture.plates.map((p) => (
                 <span key={p} className="plate-tag">
@@ -207,7 +207,7 @@ export default function PreviewScreen({
             <div className="plate-manual-add">
               <input
                 className="form-input plate-manual-add__input"
-                placeholder="Digite a placa (ex: PL 30 MR ou ABC1D23)"
+                placeholder="Matrícula UE (ex.: AB 12 CD, AB 123 CD)"
                 value={manualPlate}
                 onChange={(e) => {
                   setManualPlate(e.target.value.toUpperCase());

@@ -4,6 +4,8 @@ import re
 import cv2
 import numpy as np
 
+from european_plates import extrair_candidatos, formatar_placa, validar_placa
+
 ENGINE = "fast-alpr"
 
 _alpr = None
@@ -21,29 +23,6 @@ def _get_alpr():
             ocr_device="cpu",
         )
     return _alpr
-
-
-def validar_placa(texto: str) -> bool:
-    if len(texto) < 5 or len(texto) > 8:
-        return False
-
-    padrao_novo = re.compile(r"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$")
-    padrao_antigo = re.compile(r"^[A-Z]{3}[0-9]{4}$")
-    padrao_europeu = re.compile(r"^[A-Z]{2}[0-9]{2}[A-Z]{2}$")
-    if padrao_novo.match(texto) or padrao_antigo.match(texto) or padrao_europeu.match(texto):
-        return True
-
-    letters = sum(c.isalpha() for c in texto)
-    digits = sum(c.isdigit() for c in texto)
-    return letters >= 2 and digits >= 2 and texto.isalnum()
-
-
-def formatar_placa(texto: str) -> str:
-    if re.match(r"^[A-Z]{3}[0-9]{4}$", texto):
-        return f"{texto[:3]}-{texto[3:]}"
-    if re.match(r"^[A-Z]{2}[0-9]{2}[A-Z]{2}$", texto):
-        return f"{texto[:2]} {texto[2:4]} {texto[4:]}"
-    return texto
 
 
 def _ocr_confidence(confidence: float | list[float]) -> float:
@@ -73,17 +52,18 @@ def detect_plates_from_frame(frame: np.ndarray) -> list[str]:
         if result.ocr is None or not result.ocr.text:
             continue
 
-        texto = re.sub(r"[^A-Z0-9]", "", result.ocr.text.upper())
+        texto_bruto = result.ocr.text.upper()
         conf = _ocr_confidence(result.ocr.confidence)
 
-        if conf < 0.4 or len(texto) < 5:
+        if conf < 0.4:
             continue
 
-        for length in range(min(8, len(texto)), 4, -1):
-            candidato = texto[:length]
-            if validar_placa(candidato):
-                placas.add(formatar_placa(candidato))
-                break
+        for cand in extrair_candidatos(texto_bruto):
+            placas.add(cand)
+
+        texto = re.sub(r"[^A-Z0-9]", "", texto_bruto)
+        if len(texto) >= 5 and validar_placa(texto[:8]):
+            placas.add(formatar_placa(texto[: len(texto) if len(texto) <= 8 else 8]))
 
     return list(placas)
 
@@ -91,4 +71,3 @@ def detect_plates_from_frame(frame: np.ndarray) -> list[str]:
 def detect_plates_from_base64(image_b64: str) -> list[str]:
     frame = decode_image(image_b64)
     return detect_plates_from_frame(frame)
-

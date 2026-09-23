@@ -6,13 +6,7 @@ import DecorShapes from '@/components/DecorShapes';
 import ScreenHeader from '@/components/ScreenHeader';
 interface AuthScreenProps {
   onLogin: (email: string, password: string) => Promise<void>;
-  onRegister: (fields: {
-    email: string;
-    password: string;
-    nome: string;
-    cpf: string;
-    telefone: string;
-  }) => Promise<void>;
+  onRegister: (fields: { email: string; password: string }) => Promise<void>;
   onGoogleLogin?: () => Promise<void>;
   onBack?: () => void;
 }
@@ -32,9 +26,6 @@ export default function AuthScreen({
   const [form, setForm] = useState({
     email: '',
     password: '',
-    nome: '',
-    cpf: '',
-    telefone: '',
   });
 
   useEffect(() => {
@@ -112,32 +103,6 @@ export default function AuthScreen({
       )}
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        {mode === 'register' && (
-          <>
-            <input
-              className="form-input"
-              placeholder="Nome completo"
-              value={form.nome}
-              onChange={(e) => update('nome', e.target.value)}
-              required
-            />
-            <input
-              className="form-input"
-              placeholder="CPF (000.000.000-00)"
-              value={form.cpf}
-              onChange={(e) => update('cpf', e.target.value)}
-              required
-            />
-            <input
-              className="form-input"
-              placeholder="Telefone"
-              value={form.telefone}
-              onChange={(e) => update('telefone', e.target.value)}
-              required
-            />
-          </>
-        )}
-
         <input
           className="form-input"
           type="email"

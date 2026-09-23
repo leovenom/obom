@@ -31,11 +31,8 @@ export interface AuthorityReport {
   denunciante: {
     id: string;
     nome: string;
-    cpf: string;
     email: string;
     telefone: string;
-    chavePix: string;
-    endereco: string;
   };
   ocorrencia: {
     tipo: string;
@@ -70,6 +67,9 @@ export interface AuthorityReport {
     orgao: string;
     instrucao: string;
   };
+  objetivo: {
+    descricao: string;
+  };
 }
 
 export function buildAuthorityReport(params: {
@@ -92,11 +92,8 @@ export function buildAuthorityReport(params: {
     denunciante: {
       id: params.user.id,
       nome: params.user.nome,
-      cpf: params.user.cpf,
       email: params.user.email,
       telefone: params.user.telefone,
-      chavePix: params.user.chavePix,
-      endereco: params.user.endereco,
     },
     ocorrencia: {
       tipo: INCIDENT_LABELS[params.metadata.incidentType] || params.metadata.incidentType,
@@ -125,12 +122,16 @@ export function buildAuthorityReport(params: {
       nome: config.platformName,
       cnpj: config.platformCnpj,
       contato: config.platformContact,
-      papel: 'Intermediário tecnológico — plataforma de registro e encaminhamento',
+      papel: 'Recolha estruturada de evidências georreferenciadas para análise institucional',
     },
     destinatario: {
-      orgao: 'Autoridade de Trânsito Competente (Municipal / Estadual / DETRAN)',
+      orgao: 'Autoridade competente (municipal, ANSR ou equivalente)',
       instrucao:
-        'Documento gerado automaticamente pela plataforma OBOM para encaminhamento à autoridade responsável pela fiscalização e aplicação de penalidades.',
+        'Registo automático para apoio à priorização e dimensionamento da resposta — agrega ocorrências que hoje não são tratadas de forma sistemática.',
+    },
+    objetivo: {
+      descricao:
+        'Permitir às entidades responsáveis medir volume, padrões e localização de infrações reportadas pela população, com media e metadados verificáveis.',
     },
   };
 }

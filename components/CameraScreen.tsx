@@ -123,7 +123,7 @@ const CameraScreen = forwardRef<CameraHandle, CameraScreenProps>(function Camera
               <span className="plate-live-badge__value">{livePlate}</span>
             ) : (
               <span className="plate-live-badge__scanning">
-                {plateScanning ? 'Lendo placa...' : aiAvailable ? 'IA ativa' : 'OCR ativo'}
+                {plateScanning ? 'A ler matrícula...' : aiAvailable ? 'IA ativa' : 'OCR ativo'}
               </span>
             )}
           </div>

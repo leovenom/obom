@@ -40,10 +40,11 @@ function CaptureDetail({ record }: { record: CaptureRecord }) {
             <dd>{record.userNome}</dd>
             <dt>E-mail</dt>
             <dd>{record.userEmail}</dd>
-            {record.relatorioAutoridade.denunciante.endereco ? (
+            {'telefone' in record.relatorioAutoridade.denunciante &&
+            record.relatorioAutoridade.denunciante.telefone ? (
               <>
-                <dt>Endereço</dt>
-                <dd>{record.relatorioAutoridade.denunciante.endereco}</dd>
+                <dt>Telemóvel</dt>
+                <dd>{record.relatorioAutoridade.denunciante.telefone}</dd>
               </>
             ) : null}
           </dl>
@@ -66,7 +67,7 @@ function CaptureDetail({ record }: { record: CaptureRecord }) {
             <dd>{record.metadata.address || record.metadata.coordinates || '—'}</dd>
             <dt>Coordenadas</dt>
             <dd>{record.metadata.coordinates || '—'}</dd>
-            <dt>Placas</dt>
+            <dt>Matrículas</dt>
             <dd>{plates.length > 0 ? plates.join(', ') : '—'}</dd>
             {record.metadata.duration && (
               <>

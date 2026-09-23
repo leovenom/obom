@@ -173,7 +173,8 @@ export default function HomePage() {
 
       const result = await res.json();
       setSuccessData({
-        message: `Registro enviado com sucesso. Guarde o protocolo para acompanhamento.`,
+        message:
+          'Evidência enviada. O protocolo ajuda a agregar ocorrências para as autoridades competentes.',
         protocolo: result.record.protocolo,
       });
       setScreen('success');
@@ -211,13 +212,7 @@ export default function HomePage() {
   );
 
   const handleRegister = useCallback(
-    async (fields: {
-      email: string;
-      password: string;
-      nome: string;
-      cpf: string;
-      telefone: string;
-    }) => {
+    async (fields: { email: string; password: string }) => {
       await register(fields);
       await continueAfterAuth();
     },
@@ -279,13 +274,7 @@ export default function HomePage() {
   }, [authLoading, refresh, continueAfterAuth]);
 
   const handleProfileSave = useCallback(
-    async (fields: {
-      nome: string;
-      cpf: string;
-      telefone: string;
-      chavePix: string;
-      endereco: string;
-    }) => {
+    async (fields: { nome: string; telefone: string }) => {
       await updateProfile(fields);
       pendingSendRef.current = true;
       await continueAfterAuth();

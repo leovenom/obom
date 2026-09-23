@@ -7,13 +7,7 @@ import type { User as UserType } from '@/hooks/useAuth';
 
 interface ProfileScreenProps {
   user: UserType;
-  onSave: (fields: {
-    nome: string;
-    cpf: string;
-    telefone: string;
-    chavePix: string;
-    endereco: string;
-  }) => Promise<void>;
+  onSave: (fields: { nome: string; telefone: string }) => Promise<void>;
   onBack?: () => void;
 }
 
@@ -22,10 +16,7 @@ export default function ProfileScreen({ user, onSave, onBack }: ProfileScreenPro
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     nome: user.nome || '',
-    cpf: user.cpf || '',
     telefone: user.telefone || '',
-    chavePix: user.chavePix || '',
-    endereco: user.endereco || '',
   });
 
   const update = (field: string, value: string) =>
@@ -50,7 +41,7 @@ export default function ProfileScreen({ user, onSave, onBack }: ProfileScreenPro
       <DecorShapes variant="auth" />
 
       <p className="subtitle">
-        Seus dados serão vinculados a cada captura enviada
+        Nome e telemóvel (PT) para associar cada envio às evidências recolhidas
       </p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -63,36 +54,18 @@ export default function ProfileScreen({ user, onSave, onBack }: ProfileScreenPro
         />
         <input
           className="form-input"
-          placeholder="CPF"
-          value={form.cpf}
-          onChange={(e) => update('cpf', e.target.value)}
-          required
-        />
-        <input
-          className="form-input"
-          placeholder="Telefone"
+          type="tel"
+          placeholder="Telemóvel (ex.: 912 345 678)"
           value={form.telefone}
           onChange={(e) => update('telefone', e.target.value)}
           required
-        />
-        <input
-          className="form-input"
-          placeholder="Chave PIX"
-          value={form.chavePix}
-          onChange={(e) => update('chavePix', e.target.value)}
-          required
-        />
-        <input
-          className="form-input"
-          placeholder="Endereço (opcional)"
-          value={form.endereco}
-          onChange={(e) => update('endereco', e.target.value)}
+          autoComplete="tel"
         />
 
         {error && <p className="form-error">{error}</p>}
 
         <button className="btn btn-primary" type="submit" disabled={loading}>
-          {loading ? 'Salvando...' : 'Continuar'}
+          {loading ? 'A guardar...' : 'Continuar'}
         </button>
       </form>
     </section>

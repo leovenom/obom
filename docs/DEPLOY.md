@@ -20,7 +20,7 @@ Copie `.env.example` para `.env` no servidor.
 | `ADMIN_PASSWORD` | **Obrigatório** | Senha do `/dashboard` — **altere** qualquer valor de exemplo |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Opcional | Login Google — ver [GOOGLE-OAUTH.md](./GOOGLE-OAUTH.md) |
 | `PORT` | Opcional | Porta HTTP interna (predefinição 3001) |
-| Comissões / plataforma | Opcional | `USER_COMMISSION_PCT`, `PLATFORM_*`, etc. |
+| Plataforma (relatórios) | Opcional | `PLATFORM_NAME`, `PLATFORM_CONTACT` |
 
 Nunca commite `.env` com secrets reais.
 

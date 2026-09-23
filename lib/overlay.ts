@@ -41,7 +41,7 @@ function buildOverlayLines(metadata: CaptureMetadata): string[] {
   const lines: string[] = [];
   if (metadata.duration) lines.push(`⏱ Duração: ${metadata.duration}`);
   if (metadata.plates && metadata.plates.length > 0) {
-    lines.push(`🚗 Placas: ${metadata.plates.join(' | ')}`);
+    lines.push(`🚗 Matrículas: ${metadata.plates.join(' | ')}`);
   }
   return lines;
 }
