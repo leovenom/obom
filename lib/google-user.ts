@@ -1,22 +1,22 @@
 import { createUser, findUserByEmail, findUserByGoogleId, updateUser } from './db';
 import { generateId } from './auth';
 
-export function upsertGoogleUser(profile: {
+export async function upsertGoogleUser(profile: {
   googleId: string;
   email: string;
   nome: string;
-}) {
-  const byGoogle = findUserByGoogleId(profile.googleId);
+}): Promise<string> {
+  const byGoogle = await findUserByGoogleId(profile.googleId);
   if (byGoogle) {
     if (!byGoogle.nome && profile.nome) {
-      updateUser(byGoogle.id, { nome: profile.nome });
+      await updateUser(byGoogle.id, { nome: profile.nome });
     }
     return byGoogle.id;
   }
 
-  const byEmail = findUserByEmail(profile.email);
+  const byEmail = await findUserByEmail(profile.email);
   if (byEmail) {
-    updateUser(byEmail.id, {
+    await updateUser(byEmail.id, {
       googleId: profile.googleId,
       nome: byEmail.nome || profile.nome,
     });
@@ -25,7 +25,7 @@ export function upsertGoogleUser(profile: {
 
   const id = generateId();
   const now = new Date().toISOString();
-  createUser({
+  await createUser({
     id,
     email: profile.email.toLowerCase().trim(),
     passwordHash: '',

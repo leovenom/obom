@@ -23,7 +23,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (account?.provider !== 'google') return true;
       if (!profile?.email || !account.providerAccountId) return false;
 
-      upsertGoogleUser({
+      await upsertGoogleUser({
         googleId: account.providerAccountId,
         email: profile.email,
         nome: profile.name || profile.email.split('@')[0],
@@ -32,7 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async jwt({ token, account, profile }) {
       if (account?.provider === 'google' && profile?.email && account.providerAccountId) {
-        const userId = upsertGoogleUser({
+        const userId = await upsertGoogleUser({
           googleId: account.providerAccountId,
           email: profile.email,
           nome: profile.name || profile.email.split('@')[0],

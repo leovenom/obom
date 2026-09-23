@@ -5,6 +5,8 @@ export interface CaptureRecord {
   id: string;
   protocolo: string;
   filename: string;
+  /** Caminho no Vercel Blob (modo cloud) */
+  blobPath?: string;
   originalName: string;
   mimetype: string;
   size: number;

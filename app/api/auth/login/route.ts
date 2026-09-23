@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'E-mail e senha são obrigatórios' }, { status: 400 });
   }
 
-  const user = findUserByEmail(email);
+  const user = await findUserByEmail(email);
   if (!user || !user.passwordHash) {
     return NextResponse.json(
       { error: 'Use "Entrar com Google" para esta conta' },
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   }
 
   const token = generateToken();
-  createSession(user.id, token);
+  await createSession(user.id, token);
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {

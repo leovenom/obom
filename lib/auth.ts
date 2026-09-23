@@ -34,7 +34,7 @@ export async function getSessionUser() {
     const { auth } = await import('@/auth');
     const oauthSession = await auth();
     if (oauthSession?.user?.id) {
-      const user = findUserById(oauthSession.user.id);
+      const user = await findUserById(oauthSession.user.id);
       if (user) return sanitizeUser(user);
     }
   } catch {
@@ -45,10 +45,10 @@ export async function getSessionUser() {
   const token = cookieStore.get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
-  const session = findSession(token);
+  const session = await findSession(token);
   if (!session) return null;
 
-  const user = findUserById(session.userId);
+  const user = await findUserById(session.userId);
   if (!user) return null;
 
   return sanitizeUser(user);

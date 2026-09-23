@@ -8,5 +8,5 @@ export async function GET() {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
   }
 
-  return NextResponse.json(getCapturasByUser(user.id));
+  return NextResponse.json(await getCapturasByUser(user.id));
 }

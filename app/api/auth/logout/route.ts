@@ -7,7 +7,7 @@ import { SESSION_COOKIE } from '@/lib/auth';
 export async function POST() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
-  if (token) deleteSession(token);
+  if (token) await deleteSession(token);
 
   cookieStore.set(SESSION_COOKIE, '', {
     httpOnly: true,

@@ -28,7 +28,20 @@ Nunca commite `.env` com secrets reais.
 
 1. **Project → Settings → Environment Variables** — defina pelo menos `AUTH_SECRET`, `NEXTAUTH_URL` (URL `https://….vercel.app`), `ADMIN_PASSWORD` em **Production** (e Preview se necessário).
 2. **Redeploy** depois de gravar variáveis (o build já não exige `AUTH_SECRET` na fase de compilação, mas **runtime sem secret falha**).
-3. Storage em disco (`uploads/`, `data/`) **não persiste** — ver secção 6.
+3. **Persistência:** ligue **Blob** + **Postgres** ao projecto (ver abaixo). Sem isso, ficheiros e registos somem.
+
+#### Persistência na Vercel (Blob + Postgres)
+
+1. No projecto Vercel: **Storage → Create Database** (Postgres / Neon) e **Create Blob Store**.
+2. Ligue ambos ao projecto OBOM (variáveis `POSTGRES_URL` e `BLOB_READ_WRITE_TOKEN` são injectadas).
+3. Redeploy. As tabelas `obom_*` são criadas no primeiro pedido.
+4. Localmente, sem estas variáveis, continua a usar `uploads/` e `data/` no disco.
+
+| O quê | Onde fica (cloud) |
+|-------|-------------------|
+| Fotos/vídeos | Vercel Blob (`captures/captura-….jpg`) |
+| Registos + JSON autoridades | Postgres `obom_captures` |
+| Utilizadores / sessões | Postgres `obom_users`, `obom_sessions` |
 
 ## 2. Google OAuth (se usar)
 

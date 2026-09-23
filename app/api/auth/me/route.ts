@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ user: null });
   }
 
-  const full = findUserById(user.id);
+  const full = await findUserById(user.id);
 
   return NextResponse.json({
     user,

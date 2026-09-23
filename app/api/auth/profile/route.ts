@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  const updated = updateUser(sessionUser.id, {
+  const updated = await updateUser(sessionUser.id, {
     nome: nome.trim(),
     telefone: telefoneNorm,
   });

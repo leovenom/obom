@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Senha deve ter no mínimo 6 caracteres' }, { status: 400 });
   }
 
-  if (findUserByEmail(email)) {
+  if (await findUserByEmail(email)) {
     return NextResponse.json({ error: 'E-mail já cadastrado' }, { status: 409 });
   }
 
@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
     updatedAt: new Date().toISOString(),
   };
 
-  createUser(user);
+  await createUser(user);
 
   const token = generateToken();
-  createSession(user.id, token);
+  await createSession(user.id, token);
 
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {

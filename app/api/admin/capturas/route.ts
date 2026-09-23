@@ -11,9 +11,9 @@ export async function GET() {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
 
-  const imported = syncLegacyUploads();
-  const records = getAllCapturas();
-  const users = getCapturasGroupedByUser();
+  const imported = await syncLegacyUploads();
+  const records = await getAllCapturas();
+  const users = await getCapturasGroupedByUser();
 
   return NextResponse.json({
     total: records.length,

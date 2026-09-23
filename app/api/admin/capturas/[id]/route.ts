@@ -11,7 +11,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const record = getCaptureById(id);
+  const record = await getCaptureById(id);
   if (!record) {
     return NextResponse.json({ error: 'Registro não encontrado' }, { status: 404 });
   }

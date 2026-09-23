@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { getSessionUser } from '@/lib/auth';
 import { getCaptureById } from '@/lib/capturas-registry';
-import { isSafeCaptureFilename, readUploadFile } from '@/lib/upload-files';
+import { readCaptureMedia } from '@/lib/media-storage';
+import { isSafeCaptureFilename } from '@/lib/upload-files';
 
 export async function GET(
   _request: NextRequest,
@@ -19,7 +20,7 @@ export async function GET(
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
 
-  const record = getCaptureById(filename);
+  const record = await getCaptureById(filename);
   if (!record) {
     return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 });
   }
@@ -29,7 +30,7 @@ export async function GET(
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
 
-  const file = readUploadFile(filename);
+  const file = await readCaptureMedia(filename, record.blobPath);
   if (!file) {
     return NextResponse.json({ error: 'Arquivo não encontrado' }, { status: 404 });
   }

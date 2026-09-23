@@ -23,21 +23,26 @@ export function resolveUploadPath(filename: string): string | null {
   return filePath;
 }
 
+const MIME_TYPES: Record<string, string> = {
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webm': 'video/webm',
+  '.mp4': 'video/mp4',
+};
+
+export function mimeFromFilename(filename: string): string {
+  const ext = path.extname(filename).toLowerCase();
+  return MIME_TYPES[ext] || 'application/octet-stream';
+}
+
+/** @deprecated Use readCaptureMedia from lib/media-storage */
 export function readUploadFile(filename: string): { buffer: Buffer; mime: string } | null {
   const filePath = resolveUploadPath(filename);
   if (!filePath || !fs.existsSync(filePath)) return null;
 
-  const ext = path.extname(filePath).toLowerCase();
-  const mimeTypes: Record<string, string> = {
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.png': 'image/png',
-    '.webm': 'video/webm',
-    '.mp4': 'video/mp4',
-  };
-
   return {
     buffer: fs.readFileSync(filePath),
-    mime: mimeTypes[ext] || 'application/octet-stream',
+    mime: mimeFromFilename(filename),
   };
 }
