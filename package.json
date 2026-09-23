@@ -1,0 +1,31 @@
+{
+  "name": "obom-captura",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001 -H 0.0.0.0",
+    "dev:mobile": "bash scripts/dev-mobile.sh",
+    "dev:trust-cert": "bash scripts/trust-dev-cert.sh",
+    "auth:google": "bash scripts/setup-google-auth.sh",
+    "plates:setup": "bash python/plate_service/scripts/setup.sh",
+    "plates:dev": "bash python/plate_service/scripts/run.sh",
+    "build": "next build",
+    "start": "node scripts/start.js",
+    "start:express": "node server/index.js",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "lucide-react": "^1.47.0",
+    "next": "^15.1.0",
+    "next-auth": "^5.0.0-beta.32",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tesseract.js": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}
